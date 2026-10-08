@@ -32,6 +32,7 @@ public class Tasks {
 	private static final String MAPA = "mapa";
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
+	private static final String EXPORTAR = "exportar";
 
 	/**
 	 * This task also tests the fighting element of a round of three shots
@@ -104,6 +105,13 @@ public class Tasks {
                 case AJUDA:
                     menuHelp();
                     break;
+				case EXPORTAR:
+					if (game != null) {
+						ExcelExporter.exportarJogo(game, "historico_partida.xlsx");
+					} else {
+						System.out.println("Ainda não existe nenhum jogo em curso!");
+					}
+					break;
 				default:
 					System.out.println("Que comando é esse??? Repete ...");
 			}
@@ -127,6 +135,7 @@ public class Tasks {
 		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
+		System.out.println("- " + EXPORTAR + ": Exporta o histórico das jogadas para um ficheiro Excel.");
 		System.out.println("===============================================================");
 	}
 	/**
