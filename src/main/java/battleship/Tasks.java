@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
  * The type Tasks.
  */
 public class Tasks {
+
     /**
      * The constant LOGGER.
      */
@@ -32,6 +33,7 @@ public class Tasks {
     private static final String MAPA = "mapa";
     private static final String STATUS = "estado";
     private static final String SIMULA = "simula";
+    private static final String EXPORTAR = "exportar";
     private static final String GUARDAR = "guardar";
     private static final String CARREGAR = "carregar";
 
@@ -126,6 +128,13 @@ public class Tasks {
                         System.out.println("Erro ao carregar o jogo: " + e.getMessage());
                     }
                     break;
+                case EXPORTAR:
+                    if (game != null) {
+                        ExcelExporter.exportarJogo(game, "historico_partida.xlsx");
+                    } else {
+                        System.out.println("Ainda não existe nenhum jogo em curso!");
+                    }
+                    break;
                 case AJUDA:
                     menuHelp();
                     break;
@@ -153,6 +162,7 @@ public class Tasks {
         System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
         System.out.println("- " + GUARDAR + ": Guarda o jogo atual em saves/savegame.json.");
         System.out.println("- " + CARREGAR + ": Carrega o jogo guardado e permite continuar.");
+        System.out.println("- " + EXPORTAR + ": Exporta o histórico das jogadas para um ficheiro Excel.");
         System.out.println("- " + DESISTIR + ": Encerra o jogo.");
         System.out.println("===============================================================");
     }
@@ -224,35 +234,31 @@ public class Tasks {
      * @return The classic position that has been read
      */
     public static IPosition readClassicPosition(@NotNull Scanner in) {
-        // Verifica se ainda há tokens disponíveis
         if (!in.hasNext()) {
             throw new IllegalArgumentException("Nenhuma posição válida encontrada!");
         }
 
-        String part1 = in.next(); // Primeiro token
+        String part1 = in.next();
         String part2 = null;
 
         if (in.hasNextInt()) {
-            part2 = in.next(); // Segundo token, se disponível
+            part2 = in.next();
         }
 
         String input = (part2 != null) ? part1 + part2 : part1;
-
-        // Normalizar o input para tratar letras maiúsculas e minúsculas
         input = input.toUpperCase();
 
-        // Verificar os dois formatos possíveis: compactos e com espaço
         if (input.matches("[A-Z]\\d+")) {
-            char column = input.charAt(0); // Extrair a coluna
-            int row = Integer.parseInt(input.substring(1)); // Extrair a linha
+            char column = input.charAt(0);
+            int row = Integer.parseInt(input.substring(1));
             return new Position(column, row);
         } else if (part2 != null && part1.matches("[A-Z]") && part2.matches("\\d+")) {
-            char column = part1.charAt(0); // Extrair a coluna
-            int row = Integer.parseInt(part2); // Extrair a linha
+            char column = part1.charAt(0);
+            int row = Integer.parseInt(part2);
             return new Position(column, row);
         } else {
             throw new IllegalArgumentException("Formato inválido. Use 'A3', 'A 3' ou similar.");
         }
     }
-
 }
+

@@ -1,22 +1,14 @@
-/**
- * 
- */
 package battleship;
 
-public class Main
-{
+public class Main {
+
 	/**
-	 * Main.
+	 * Main entry point for the Battleship game.
 	 *
-	 * @param args the args
+	 * @param args the command line arguments
 	 */
-	public static void main(String[] args)
-    {
+	public static void main(String[] args) {
 		System.out.println("***  Battleship  ***");
-
-		// Teste de geracao do relatorio PDF
-		PDFReportGenerator.generateReport("reports/relatorio_partida.pdf", "Jogador", 25, 11, 80.0);
-
 		Tasks.menu();
-    }
+	}
 }
