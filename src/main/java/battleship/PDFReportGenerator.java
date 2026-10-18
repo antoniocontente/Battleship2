@@ -42,7 +42,7 @@ public class PDFReportGenerator {
 
                 // Nota informativa
                 stream.setFont(PDType1Font.HELVETICA_OBLIQUE, 10);
-                stream.showText("Relatorio gerado automaticamente no fim do jogo.");
+                stream.showText("Relatorio gerado a partir do estado atual da partida.");
 
                 stream.endText();
             }
