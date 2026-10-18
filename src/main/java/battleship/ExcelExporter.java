@@ -59,9 +59,30 @@ public class ExcelExporter {
                 int numShots = (move.getShots() != null) ? move.getShots().size() : 0;
                 row.createCell(3).setCellValue(numShots);
 
-                // Quantidade de resultados
-                int numResults = (move.getShotResults() != null) ? move.getShotResults().size() : 0;
-                row.createCell(4).setCellValue(numResults);
+                // Detalhe de cada resultado
+                StringBuilder resultadosStr = new StringBuilder();
+                if (move.getShotResults() != null && !move.getShotResults().isEmpty()) {
+                    for (int j = 0; j < move.getShotResults().size(); j++) {
+                        IGame.ShotResult res = move.getShotResults().get(j);
+                        if (j > 0) {
+                            resultadosStr.append(", ");
+                        }
+                        if (res == null || !res.valid()) {
+                            resultadosStr.append("Inválido");
+                        } else if (res.repeated()) {
+                            resultadosStr.append("Repetido");
+                        } else if (res.ship() == null) {
+                            resultadosStr.append("Água");
+                        } else if (res.sunk()) {
+                            resultadosStr.append("Afundou (").append(res.ship().getCategory()).append(")");
+                        } else {
+                            resultadosStr.append("Acertou (").append(res.ship().getCategory()).append(")");
+                        }
+                    }
+                } else {
+                    resultadosStr.append("Sem resultados");
+                }
+                row.createCell(4).setCellValue(resultadosStr.toString());
             }
         } else {
             // Se ainda não houver jogadas registadas na memória
@@ -74,10 +95,15 @@ public class ExcelExporter {
             sheet.autoSizeColumn(i);
         }
 
+        // Assegurar que a pasta de destino existe
+        java.io.File file = new java.io.File(caminhoFicheiro);
+        if (file.getParentFile() != null) {
+            file.getParentFile().mkdirs();
+        }
+
         // Gravar no ficheiro
-        try (FileOutputStream fileOut = new FileOutputStream(caminhoFicheiro)) {
-            workbook.write(fileOut);
-            workbook.close();
+        try (Workbook wb = workbook; FileOutputStream fileOut = new FileOutputStream(file)) {
+            wb.write(fileOut);
             System.out.println("Histórico exportado com sucesso para: " + caminhoFicheiro);
         } catch (IOException e) {
             System.err.println("Erro ao exportar o ficheiro Excel: " + e.getMessage());

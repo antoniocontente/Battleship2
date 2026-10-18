@@ -11,19 +11,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Tasks {
 
-    /**
-     * The constant LOGGER.
-     */
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /**
-     * The constant GOODBYE_MESSAGE.
-     */
     private static final String GOODBYE_MESSAGE = "Bons ventos!";
 
-    /**
-     * Strings to be used by the user
-     */
     private static final String AJUDA = "ajuda";
     private static final String GERAFROTA = "gerafrota";
     private static final String LEFROTA = "lefrota";
@@ -36,10 +27,8 @@ public class Tasks {
     private static final String EXPORTAR = "exportar";
     private static final String GUARDAR = "guardar";
     private static final String CARREGAR = "carregar";
+    private static final String PDF = "pdf";
 
-    /**
-     * This task also tests the fighting element of a round of three shots
-     */
     public static void menu() {
 
         IFleet myFleet = null;
@@ -91,7 +80,7 @@ public class Tasks {
                             try {
                                 Thread.sleep(3000);
                             } catch (InterruptedException e) {
-                                Thread.currentThread().interrupt(); // Best practice: restore interrupt status
+                                Thread.currentThread().interrupt();
                             }
                         }
 
@@ -130,9 +119,31 @@ public class Tasks {
                     break;
                 case EXPORTAR:
                     if (game != null) {
-                        ExcelExporter.exportarJogo(game, "historico_partida.xlsx");
+                        ExcelExporter.exportarJogo(game, "reports/historico_partida.xlsx");
                     } else {
                         System.out.println("Ainda não existe nenhum jogo em curso!");
+                    }
+                    break;
+                case PDF:
+                    if (game != null) {
+                        int afundados = game.getSunkShips();
+                        int tirosTotais = 0;
+                        if (game.getAlienMoves() != null) {
+                            for (IMove move : game.getAlienMoves()) {
+                                if (move.getShots() != null) {
+                                    tirosTotais += move.getShots().size();
+                                }
+                            }
+                        }
+                        int hits = game.getHits();
+                        double precisao = tirosTotais > 0 ? ((double) hits / tirosTotais) * 100.0 : 0.0;
+                        String statusJogo = (game.getRemainingShips() == 0) ? "Jogador (Fim do Jogo)" : "Em Curso";
+
+                        String caminhoPdf = "reports/relatorio_partida.pdf";
+
+                        PDFReportGenerator.generateReport(caminhoPdf, statusJogo, tirosTotais, afundados, precisao);
+                    } else {
+                        System.out.println("Ainda não existe nenhum jogo em curso para gerar PDF!");
                     }
                     break;
                 case AJUDA:
@@ -147,15 +158,12 @@ public class Tasks {
         System.out.println(GOODBYE_MESSAGE);
     }
 
-    /**
-     * This function provides help information about the menu commands.
-     */
     public static void menuHelp() {
         System.out.println("======================= AJUDA DO MENU =========================");
         System.out.println("Digite um dos comandos abaixo para interagir com o jogo:");
         System.out.println("- " + GERAFROTA + ": Gera uma frota aleatória de navios.");
         System.out.println("- " + LEFROTA + ": Permite criar e carregar uma frota personalizada.");
-        System.out.println("- " + STATUS + ": Mostra o status atual da frota.)");
+        System.out.println("- " + STATUS + ": Mostra o status atual da frota.");
         System.out.println("- " + MAPA + ": Exibe o mapa da frota.");
         System.out.println("- " + RAJADA + ": Realiza uma rajada de disparos.");
         System.out.println("- " + SIMULA + ": Simula um jogo completo.");
@@ -163,22 +171,16 @@ public class Tasks {
         System.out.println("- " + GUARDAR + ": Guarda o jogo atual em saves/savegame.json.");
         System.out.println("- " + CARREGAR + ": Carrega o jogo guardado e permite continuar.");
         System.out.println("- " + EXPORTAR + ": Exporta o histórico das jogadas para um ficheiro Excel.");
+        System.out.println("- " + PDF + ": Gera um relatório da partida em formato PDF.");
         System.out.println("- " + DESISTIR + ": Encerra o jogo.");
         System.out.println("===============================================================");
     }
 
-    /**
-     * This operation allows the build up of a fleet, given user data
-     *
-     * @param in The scanner to read from
-     * @return The fleet that has been built
-     */
     public static Fleet buildFleet(Scanner in) {
-
         assert in != null;
 
         Fleet fleet = new Fleet();
-        int i = 0; // i represents the total of successfully created ships
+        int i = 0;
         while (i < Fleet.FLEET_SIZE) {
             IShip s = readShip(in);
             if (s != null) {
@@ -195,14 +197,7 @@ public class Tasks {
         return fleet;
     }
 
-    /**
-     * This operation reads data about a ship, build it and returns it
-     *
-     * @param in The scanner to read from
-     * @return The created ship based on the data that has been read
-     */
     public static Ship readShip(Scanner in) {
-
         assert in != null;
 
         String shipKind = in.next();
@@ -212,14 +207,7 @@ public class Tasks {
         return Ship.buildShip(shipKind, bearing, pos);
     }
 
-    /**
-     * This operation allows reading a position in the map
-     *
-     * @param in The scanner to read from
-     * @return The position that has been read
-     */
     public static Position readPosition(Scanner in) {
-
         assert in != null;
 
         int row = in.nextInt();
@@ -227,12 +215,6 @@ public class Tasks {
         return new Position(row, column);
     }
 
-    /**
-     * This operation allows reading a position in the map
-     *
-     * @param in The scanner to read from
-     * @return The classic position that has been read
-     */
     public static IPosition readClassicPosition(@NotNull Scanner in) {
         if (!in.hasNext()) {
             throw new IllegalArgumentException("Nenhuma posição válida encontrada!");
@@ -261,4 +243,3 @@ public class Tasks {
         }
     }
 }
-
