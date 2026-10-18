@@ -14,6 +14,9 @@ public class Main
     {
 		System.out.println("***  Battleship  ***");
 
+		// Teste de geracao do relatorio PDF
+		PDFReportGenerator.generateReport("reports/relatorio_partida.pdf", "Jogador", 25, 11, 80.0);
+
 		Tasks.menu();
     }
 }

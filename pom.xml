@@ -134,11 +134,13 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<!-- Geração de relatórios PDF -->
 		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.5</version>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>2.0.31</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>
