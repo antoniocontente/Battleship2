@@ -1,165 +1,79 @@
 # ⚓ Battleship 2.0
 
+> 🎥 **Vídeo de Demonstração (YouTube):** [https://www.youtube.com/watch?v=sxTSu2tDtMA](https://www.youtube.com/watch?v=sxTSu2tDtMA)
+
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![Java Version](https://img.shields.io/badge/Java-17%2B-blue)
+![Java Version](https://img.shields.io/badge/Java-21-blue)
+![Build Tool](https://img.shields.io/badge/Maven-3.x-red)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-> A modern take on the classic naval warfare game, designed for the XVII century setting with updated software engineering patterns.
+A modern take on the classic naval warfare game, designed for the XVII century Portuguese Discoveries setting with automated build workflows and AI interoperability.
 
-### Grupo: GrupoTP02_LETI-5
-
-
-## Membros da Equipa
-
-| Número | Nome | Curso | Repo |
-| :---: | :--- | :---: | :---: |
-| 122615 | Rodrigo Chaves | LETI |  |
-| 122650 | Miguel Pancada | LETI | https://github.com/miguelpancada05 |
-| 129787 | António Contente | LETI | https://github.com/antoniocontente |
-| 122652 | Gonçalo Gonçalves | LETI | https://github.com/ggpsg |
-
-> **Nota:** Os nomes das contas do github estão diferentes então foram adicionados á tabela com o conhecimento do professor.
+### Turma / Grupo: GrupoTP02_LETI-5
 
 ---
 
-## 📖 Table of Contents
-- [Project Overview](#-project-overview)
-- [Key Features](#-key-features)
-- [Technical Stack](#-technical-stack)
-- [Installation & Setup](#-installation--setup)
-- [Code Architecture](#-code-architecture)
-- [Roadmap](#-roadmap)
-- [Contributing](#-contributing)
+## 👥 Membros da Equipa
+
+| Número | Nome | Curso | GitHub Repo / Profile |
+| :---: | :--- | :---: | :--- |
+| **122615** | Rodrigo Chaves | LETI | https://github.com/122615 |
+| **122650** | Miguel Pancada | LETI | https://github.com/miguelpancada05 |
+| **129787** | António Contente | LETI | https://github.com/antoniocontente |
+| **122652** | Gonçalo Gonçalves | LETI | https://github.com/ggpsg |
+
+> **Nota:** Os nomes e identificadores das contas GitHub foram mapeados e associados na tabela em conformidade com o conhecimento do docente.
 
 ---
 
-## 🎯 Project Overview
-This project serves as a template and reference for students learning **Object-Oriented Programming (OOP)** and **Software Quality**. It simulates a battleship environment where players must strategically place ships and sink the enemy fleet.
+## 📋 User Stories Implementadas (Sprint - Parte 1)
 
-### 🎮 The Rules
-The game is played on a grid (typically 10x10). The coordinate system is defined as:
+Cada membro do grupo desenvolveu um requisito individual num ramo dedicado, integrando uma dependência externa através do Maven Central:
 
-$$(x, y) \in \{0, \dots, 9\} \times \{0, \dots, 9\}$$
-
-Hits are calculated based on the intersection of the shot vector and the ship's bounding box.
-
----
-
-## ✨ Key Features
-| Feature | Description | Status |
-| :--- | :--- | :---: |
-| **Grid System** | Flexible $N \times N$ board generation. | ✅ |
-| **Ship Varieties** | Galleons, Frigates, and Brigantines (XVII Century theme). | ✅ |
-| **AI Opponent** | Heuristic-based targeting system. | 🚧 |
-| **Network Play** | Socket-based multiplayer. | ❌ |
+1. **Geração de Relatório de Partida em PDF:** Exportação automática das estatísticas do jogo em ficheiro PDF através da biblioteca **Apache PDFBox** (`org.apache.pdfbox:pdfbox:2.0.31`).
+2. **Exportação de Histórico para Folha de Cálculo:** Registo detalhado das rajadas e coordenadas para ficheiro Excel utilizando a biblioteca **Apache POI**.
+3. **Persistência e Gravação de Estado:** Funcionalidades de `guardar` e `carregar` o estado completo do tabuleiro e frotas em formato JSON via biblioteca **Jackson** (`com.fasterxml.jackson.core:jackson-databind`).
+4. **Visualização e Registo Estruturado de Tiros:** Mapeamento visual das rajadas e validação das regras de dispersão de tiros.
 
 ---
 
-## 🛠 Technical Stack
-* **Language:** Java 17
-* **Build Tool:** Maven / Gradle
-* **Testing:** JUnit 5
-* **Logging:** Log4j2
+## 🤖 Treino e Estratégia com IA (Sprint - Parte 2)
 
----
+Integração de um LLM como oponente inteligente através do intercâmbio de mensagens estruturadas em formato JSON e aplicação de técnicas de *few-shot prompting*.
 
-## 🚀 Installation & Setup
+### Prompt Final da Estratégia (Few-Shot & Tática de Jogo)
 
-### Prerequisites
-* JDK 17 or higher
-* Git
+```text
+Considere agora a seguinte tática avançada de geração de rajadas de tiros para derrotar o oponente com o menor número de jogadas possível.
 
-### Step-by-Step
-1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/britoeabreu/Battleship2.git](https://github.com/britoeabreu/Battleship2.git)
-   ```
-2. **Navigate to directory:**
-   ```bash
-   cd Battleship2
-   ```
-3. **Compile and Run:**
-   ```bash
-   javac Main.java && java Main
-   ```
+Crie e mantenha atualizado um Diário de Bordo antes de cada resposta, numerando as rajadas sequencialmente (Rajada 1, 2, 3...). Registe em cada entrada as coordenadas exatas disparadas e o resultado global da rajada (Água, Nau atingida, Barca afundada, etc.), a lista atualizada de navios inimigos restantes (começando com 4 Barcas de 1 posição, 3 Caravelas de 2 posições, 2 Naus de 3 posições, 1 Fragata de 4 posições e 1 Galeão de 5 posições em forma de T), e o mapa mental de exclusão com coordenadas já disparadas ou descartadas por halo de segurança. A memória é a principal arma de um bom estratega.
 
----
+Não dispare fora dos limites do mapa (linhas A a J e colunas 1 a 10, evitando erros como Z99) nem repita tiros em coordenadas já testadas ou descartadas. A única exceção para este desperdício de pólvora é a última rajada do jogo, apenas para perfazer os 3 tiros obrigatórios quando a frota inimiga já estiver irremediavelmente no fundo do mar.
 
-## 📚 Documentation
+Quando não houver navios feridos por afundar (Modo Caça), utilize uma grelha de paridade em padrão de xadrez, disparando em casas alternadas (por exemplo A2, A4, A6, B1, B3) para maximizar a cobertura espacial e intercetar rapidamente os navios maiores. Distribua os 3 tiros da rajada por quadrantes distintos do tabuleiro que ainda tenham alta densidade de células livres. Se restarem apenas Barcas de 1 posição por encontrar, procure prioritariamente nos espaços vazios isolados onde já não caberiam navios maiores.
 
-You can access the generated Javadoc here:
+Se atingir um navio numa rajada (Modo Alvo), dispare nas posições contíguas ortogonais (Norte, Sul, Este, Oeste) na jogada seguinte para descobrir a orientação da embarcação e acabar de a afundar. No entanto, se a rajada anterior confirmar que o navio já foi afundado (por exemplo, em sunkBoats aparecer uma Barca), não dispare para as posições contíguas, pois os navios nunca estão encostados.
 
-👉 [Battleship2 API Documentation](https://britoeabreu.github.io/Battleship2/)
+Como as Caravelas, Naus e Fragatas são linhas retas, um tiro certeiro significa que o resto do navio está na horizontal ou na vertical. Assim que confirmar dois acertos contíguos (por exemplo C4 e C5), o eixo do navio fica determinado; concentre os tiros seguintes nas extremidades dessa linha (C3 e C6) até afundar o navio. Como os navios não se podem tocar nem sequer nos cantos, as posições diagonais a um tiro certeiro são garantidamente água (a única exceção é o corpo do Galeão, devido à sua forma em T com um corpo de 3 posições e duas asas da ponte numa extremidade). Evitar estas diagonais poupa imensos tiros. Se o relatório indicar que atingiu um Galeão, teste tanto o prolongamento do eixo como as posições perpendiculares na extremidade para destruir as asas.
 
+Quando o relatório de uma rajada confirmar que um navio foi afundado (por exemplo uma Fragata de 4 posições), analise os dados do seu Diário de Bordo para identificar exatamente onde caíram esses 4 tiros. Confirmada a posição exata da carcaça, marque todas as quadrículas adjacentes (o halo de 1 posição em redor de todo o navio, incluindo diagonais) como água intransitável, pois é impossível haver outra embarcação nesse perímetro.
 
-### Core Logic
-```java
-public class Ship {
-    private String name;
-    private int size;
-    private boolean isSunk;
+Aplique os seguintes exemplos práticos de raciocínio tático:
 
-    // TODO: Implement damage logic
-    public void hit() {
-        // Implementation here
-    }
-}
-```
+Exemplo 1 (Barca afundada e marcação de halo):
+- Rajada Disparada: [{"row": "B", "column": 2}, {"row": "E", "column": 5}, {"row": "H", "column": 8}]
+- Resposta Recebida: {"validShots": 3, "sunkBoats": [{"count": 1, "type": "Barca"}], "repeatedShots": 0, "outsideShots": 0, "hitsOnBoats": [], "missedShots": 2}
+- Ação Tática: Uma Barca de 1 posição foi afundada ao primeiro tiro e não há navios feridos em hitsOnBoats. Não desperdice tiros nas adjacências de B2, E5 ou H8 à procura de continuação; continue em Modo Caça noutras coordenadas livres.
 
-### Design Patterns Used:
-- **Strategy Pattern:** For different AI difficulty levels.
-- **Observer Pattern:** To update the UI when a ship is hit.
-</details>
+Exemplo 2 (Nau atingida e foco ortogonal):
+- Rajada Disparada: [{"row": "D", "column": 4}, {"row": "A", "column": 1}, {"row": "J", "column": 10}]
+- Resposta Recebida: {"validShots": 3, "sunkBoats": [], "repeatedShots": 0, "outsideShots": 0, "hitsOnBoats": [{"hits": 1, "type": "Nau"}], "missedShots": 2}
+- Ação Tática: Assumindo que o tiro certeiro foi em D4, marque imediatamente as diagonais C3, C5, E3 e E5 como água garantida. Na rajada seguinte, dispare nas posições ortogonais contíguas: [{"row": "C", "column": 4}, {"row": "E", "column": 4}, {"row": "D", "column": 5}].
 
-### Logic Flow
-```mermaid
-graph TD
-    A[Start Game] --> B{Place Ships}
-    B --> C[Player Turn]
-    C --> D[Target Coordinate]
-    D --> E{Hit or Miss?}
-    E -- Hit --> F[Check if Sunk]
-    E -- Miss --> G[AI Turn]
-    F --> G
-    G --> C
-```
-
----
-
-## 🗺 Roadmap
-- [x] Basic grid implementation
-- [x] Ship placement validation
-- [ ] Add sound effects (SFX)
-- [ ] Implement "Fog of War" mechanic
-- [ ] **Multiplayer Integration** (High Priority)
-
----
-
-## 🧪 Testing
-We use high-coverage unit testing to ensure game stability. Run tests using:
-```bash
-mvn test
-```
-
-> [!TIP]
-> Use the `-Dtest=ClassName` flag to run specific test suites during development.
-
----
-
-## 🤝 Contributing
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a **Pull Request**
-
----
-
-## 📄 License
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
-**Maintained by:** [@britoeabreu](https://github.com/britoeabreu)  
-*Created for the Software Engineering students at ISCTE-IUL.*
+Em cada turno, apresente o resumo do seu Diário de Bordo seguido da próxima rajada de 3 tiros no formato JSON acordado:
+[
+  {"row": "X", "column": Y},
+  {"row": "X", "column": Y},
+  {"row": "X", "column": Y}
+]
+Se a sua frota for toda afundada, declare a derrota com honra. Em contrapartida, seja um vencedor magnânimo se for o inimigo a render-se com os navios todos no fundo do oceano! Comece agora por enviar a Rajada 1.
