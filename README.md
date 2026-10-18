@@ -30,11 +30,9 @@ A modern take on the classic naval warfare game, designed for the XVII century P
 
 Cada membro do grupo desenvolveu um requisito individual num ramo dedicado, integrando uma dependência externa através do Maven Central:
 
-1. **Geração de Relatório de Partida em PDF:** Exportação automática das estatísticas do jogo em ficheiro PDF através da biblioteca **Apache PDFBox** (`org.apache.pdfbox:pdfbox:2.0.31`).
-2. **Exportação de Histórico para Folha de Cálculo:** Registo detalhado das rajadas e coordenadas para ficheiro Excel utilizando a biblioteca **Apache POI**.
-3. **Persistência e Gravação de Estado:** Funcionalidades de `guardar` e `carregar` o estado completo do tabuleiro e frotas em formato JSON via biblioteca **Jackson** (`com.fasterxml.jackson.core:jackson-databind`).
-4. **Visualização e Registo Estruturado de Tiros:** Mapeamento visual das rajadas e validação das regras de dispersão de tiros.
-
+1. **Geração de Relatório de Partida em PDF:** Exportação das estatísticas e do resultado do jogo para um ficheiro PDF através da biblioteca **Apache PDFBox** (`org.apache.pdfbox:pdfbox:2.0.31`).
+2. **Exportação do Histórico de Jogadas para Excel:** Registo detalhado das rajadas, tiros e estado da partida numa folha de cálculo através da biblioteca **Apache POI** (`org.apache.poi:poi-ooxml`).
+3. **Persistência de Jogo (Guardar / Carregar):** Capacidade de guardar o estado da partida e retomar jogos anteriores a partir de ficheiros estruturados em formato JSON utilizando a biblioteca **Jackson** (`com.fasterxml.jackson.core:jackson-databind`).
 ---
 
 ## 🤖 Treino e Estratégia com IA (Sprint - Parte 2)
