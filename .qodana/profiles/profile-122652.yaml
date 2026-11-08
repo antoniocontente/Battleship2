@@ -1,16 +1,30 @@
 # 122652 - Gonçalo Gonçalves
 # Cheiro: Large Class (Fowler), aproximado pela estrategia God Class
 # de "Object-Oriented Metrics in Practice" (Lanza & Marinescu).
+# Cada inspecao aparece com os dois IDs: o do linter 2025.1 (MethodCount,
+# ClassComplexity) e o das versoes recentes (ClassWithTooManyMethods,
+# OverlyComplexClass). IDs desconhecidos sao ignorados pelo Qodana.
 name: "Large Class 122652"
 baseProfile: empty
 inspections:
   # NOM > 15 (NOM/Class "muito alto" em Java, Tabela 2.2 do livro)
+  - inspection: MethodCount
+    enabled: true
+    severity: WARNING
+    options:
+      m_limit: 15
   - inspection: ClassWithTooManyMethods
     enabled: true
     severity: WARNING
     options:
       m_limit: 15
   # Soma da complexidade ciclomatica dos metodos (~WMC) >= 47
+  # (a inspecao reporta valores > m_limit)
+  - inspection: ClassComplexity
+    enabled: true
+    severity: WARNING
+    options:
+      m_limit: 46
   - inspection: OverlyComplexClass
     enabled: true
     severity: WARNING
