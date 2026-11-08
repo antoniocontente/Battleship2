@@ -1,0 +1,22 @@
+# 122650 Miguel Pancada
+name: Checkstyle gate 122650
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  checkstyle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Checkstyle
+        uses: dbelyaev/action-checkstyle@v1.0.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          checkstyle_config: checkstyle-122650.xml
+          reporter: github-pr-review
+          fail_on_error: true
