@@ -1,9 +1,8 @@
 # 129787 - António
 name: "Long Method Profile 129787"
-baseProfile: empty
+base:
+  name: empty
 inspections:
-  - group: ALL
-    enabled: false
   - inspection: OverlyLongMethod
     enabled: true
     options:
