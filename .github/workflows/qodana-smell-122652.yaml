@@ -1,0 +1,32 @@
+# 122652 - Gonçalo Gonçalves
+name: Qodana smell gate 122652 (Large Class)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  qodana-122652:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Qodana Scan (Large Class)
+        uses: JetBrains/qodana-action@v2025.1
+        with:
+          args: --config=qodana-122652.yaml
+          use-annotations: true
+          post-pr-comment: true
+          upload-result: true
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
