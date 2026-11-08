@@ -22,7 +22,7 @@ public class Barge extends Ship {
 		// Add the single position of the barge to the list of positions
 		getPositions().add(new Position(pos.getRow(), pos.getColumn()));
 	}
-	public void MetodoErrado() {
+	public void metodoErrado() {
 		// violação de MethodName
 	}
 
