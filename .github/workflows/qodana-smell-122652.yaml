@@ -25,6 +25,7 @@ jobs:
         uses: JetBrains/qodana-action@v2025.1
         with:
           args: --config=qodana-122652.yaml
+          pr-mode: ${{ github.event_name == 'pull_request' }}
           use-annotations: true
           post-pr-comment: true
           upload-result: true
