@@ -1,0 +1,18 @@
+# 122652 - Gonçalo Gonçalves
+# Cheiro: Large Class (Fowler), aproximado pela estrategia God Class
+# de "Object-Oriented Metrics in Practice" (Lanza & Marinescu).
+name: "Large Class 122652"
+baseProfile: empty
+inspections:
+  # NOM > 15 (NOM/Class "muito alto" em Java, Tabela 2.2 do livro)
+  - inspection: ClassWithTooManyMethods
+    enabled: true
+    severity: WARNING
+    options:
+      m_limit: 15
+  # Soma da complexidade ciclomatica dos metodos (~WMC) >= 47
+  - inspection: OverlyComplexClass
+    enabled: true
+    severity: WARNING
+    options:
+      m_limit: 46
