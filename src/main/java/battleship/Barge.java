@@ -22,4 +22,18 @@ public class Barge extends Ship {
 		// Add the single position of the barge to the list of positions
 		getPositions().add(new Position(pos.getRow(), pos.getColumn()));
 	}
+
+	// Violação Checkstyle (nome do método começa com maiúscula)
+    // Violação Qodana (OverlyComplexMethod: 9 ifs ultrapassam o limiar 8)
+    public void MetodoComErroViolacao(int x) {
+        if (x == 1) System.out.println(1);
+        if (x == 2) System.out.println(2);
+        if (x == 3) System.out.println(3);
+        if (x == 4) System.out.println(4);
+        if (x == 5) System.out.println(5);
+        if (x == 6) System.out.println(6);
+        if (x == 7) System.out.println(7);
+        if (x == 8) System.out.println(8);
+        if (x == 9) System.out.println(9);
+    }
 }
