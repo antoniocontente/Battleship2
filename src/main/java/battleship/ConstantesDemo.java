@@ -2,5 +2,5 @@ package battleship;
 
 public class ConstantesDemo {
 
-    public static final int maxShips = 3;
+    public static final int MAX_SHIPS = 3;
 }
