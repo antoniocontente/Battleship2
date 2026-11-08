@@ -4,6 +4,8 @@
 # Cada inspecao aparece com os dois IDs: o do linter 2025.1 (MethodCount,
 # ClassComplexity) e o das versoes recentes (ClassWithTooManyMethods,
 # OverlyComplexClass). IDs desconhecidos sao ignorados pelo Qodana.
+# Os testes (src/test) ficam de fora: classes de teste tem naturalmente
+# um metodo por caso de teste e nao representam o cheiro Large Class.
 name: "Large Class 122652"
 baseProfile: empty
 inspections:
@@ -11,11 +13,15 @@ inspections:
   - inspection: MethodCount
     enabled: true
     severity: WARNING
+    ignore:
+      - "src/test/**"
     options:
       m_limit: 15
   - inspection: ClassWithTooManyMethods
     enabled: true
     severity: WARNING
+    ignore:
+      - "src/test/**"
     options:
       m_limit: 15
   # Soma da complexidade ciclomatica dos metodos (~WMC) >= 47
@@ -23,10 +29,14 @@ inspections:
   - inspection: ClassComplexity
     enabled: true
     severity: WARNING
+    ignore:
+      - "src/test/**"
     options:
       m_limit: 46
   - inspection: OverlyComplexClass
     enabled: true
     severity: WARNING
+    ignore:
+      - "src/test/**"
     options:
       m_limit: 46
