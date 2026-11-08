@@ -1,13 +1,23 @@
 # 129787 - António
 name: "Long Method Profile 129787"
-baseProfile: empty
+baseProfile: qodana.starter
 
 inspections:
+  - group: ALL
+    enabled: false
   - inspection: OverlyLongMethod
     enabled: true
     options:
       m_limit: 20
   - inspection: OverlyComplexMethod
+    enabled: true
+    options:
+      m_limit: 10
+  - inspection: NonCommentSourceStatements
+    enabled: true
+    options:
+      m_limit: 20
+  - inspection: CyclomaticComplexity
     enabled: true
     options:
       m_limit: 10
