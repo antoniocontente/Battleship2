@@ -24,29 +24,5 @@ public class Barge extends Ship {
 	}
 
 
-	public void metodoMonstroDeTeste() {
-		int x = 0;
-		if (x == 0) { x++; }
-		if (x == 1) { x++; }
-		if (x == 2) { x++; }
-		if (x == 3) { x++; }
-		if (x == 4) { x++; }
-		if (x == 5) { x++; }
-		if (x == 6) { x++; }
-		if (x == 7) { x++; }
-		if (x == 8) { x++; }
-		if (x == 9) { x++; }
-		if (x == 10) { x++; }
-		if (x == 11) { x++; }
-		if (x == 12) { x++; }
-		if (x == 13) { x++; }
-		if (x == 14) { x++; }
-		if (x == 15) { x++; }
-		if (x == 16) { x++; }
-		if (x == 17) { x++; }
-		if (x == 18) { x++; }
-		if (x == 19) { x++; }
-		if (x == 20) { x++; }
-		System.out.println("Método gigante de teste para chumbar o Quality Gate: " + x);
-	}
+
 }
