@@ -19,10 +19,5 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Run Checkstyle
-        uses: checkstyle/action-checkstyle@master
-        with:
-          path: 'src/main/java'
-          config: 'checkstyle-129787.xml'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run Checkstyle via Maven
+        run: mvn checkstyle:check -Dcheckstyle.config.location=checkstyle-129787.xml
