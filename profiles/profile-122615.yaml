@@ -1,0 +1,10 @@
+# 122615 - Rodrigo Chaves
+profile:
+  base:
+    name: empty
+inspections:
+  - inspection: MethodWithTooManyParameters
+    enabled: true
+    severity: WARNING
+    options:
+      m_limit: 3
