@@ -1,0 +1,25 @@
+# 122615 - Rodrigo Chaves
+name: Checkstyle naming gate 122615 (ConstantName)
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  checkstyle-122615:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkstyle (ConstantName)
+        uses: dbelyaev/action-checkstyle@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          checkstyle_config: checkstyle-122615.xml
+          reporter: github-pr-check
+          level: error
+          fail_level: error
