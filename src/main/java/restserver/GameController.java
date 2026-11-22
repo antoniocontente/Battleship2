@@ -12,12 +12,26 @@ import java.util.List;
 /**
  * REST Controller — exposes the two endpoints of the Battleship protocol.
  *
- *   POST /register                    →  m0  register a player
- *   POST /game/{gameId}/shots         →  m1a receive student shots, fire back (m1b)
- *                                        then call student callback (m2a/m2b) internally
+ *   POST /register                    ->  m0  register a player
+ *   POST /game/{gameId}/shots         ->  m1a receive student shots, fire back (m1b)
+ *                                         then call student callback (m2a/m2b) internally
  */
 @RestController
 public class GameController {
+
+	private static final int MIN_COLUMN = 1;
+	private static final int MAX_COLUMN = 10;
+
+	private static final String STATUS_REGISTERED = "REGISTERED";
+	private static final String STATUS_ONGOING = "ONGOING";
+	private static final String STATUS_GAME_OVER = "GAME_OVER";
+	private static final String WINNER_STUDENT = "STUDENT_WINS";
+
+	private static final String OUTCOME_INVALID = "INVALID";
+	private static final String OUTCOME_REPEATED = "REPEATED";
+	private static final String OUTCOME_MISS = "MISS";
+	private static final String OUTCOME_SUNK = "SUNK";
+	private static final String OUTCOME_HIT = "HIT";
 
 	private final GameRegistry registry;
 	private final CallbackClient callbackClient;
@@ -31,23 +45,8 @@ public class GameController {
 		this.aiStrategy     = aiStrategy;
 	}
 
-	// =========================================================================
-	// m0 — POST /register
-	// =========================================================================
-
-	/**
-	 * Registers a student player and starts a new game.
-	 *
-	 * The AI places its own fleet randomly (via Fleet.createRandom()).
-	 * The student's fleet is unknown to us — we will discover it shot by shot.
-	 *
-	 * @param request  { playerName, callbackUrl }
-	 * @return         { gameId, status, shotsPerTurn, message }
-	 */
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody RegistrationRequest request) {
-
-		// Basic validation
 		if (request.playerName == null || request.playerName.isBlank()) {
 			return error(HttpStatus.BAD_REQUEST, "playerName is required");
 		}
@@ -55,12 +54,11 @@ public class GameController {
 			return error(HttpStatus.BAD_REQUEST, "callbackUrl is required");
 		}
 
-		// Create session — AI fleet is randomised inside GameSession constructor
 		GameSession session = registry.createSession(request.playerName, request.callbackUrl);
 
 		RegistrationResponse response = new RegistrationResponse();
 		response.gameId       = session.getGameId();
-		response.status       = "REGISTERED";
+		response.status       = STATUS_REGISTERED;
 		response.shotsPerTurn = session.getShotsPerTurn();
 		response.message      = "Welcome, " + request.playerName + "! Game ready. You shoot first.";
 
@@ -70,90 +68,75 @@ public class GameController {
 		return ResponseEntity.ok(response);
 	}
 
-	// =========================================================================
-	// m1a + m1b — POST /game/{gameId}/shots
-	// =========================================================================
-
-	/**
-	 * Receives the student's shots (m1a), evaluates them against the AI's fleet,
-	 * then — if the game is not over — triggers the AI's own shots via the
-	 * student's callback URL (m2a/m2b) within the same HTTP round-trip.
-	 *
-	 * Returns the results of the STUDENT's shots only (m1b).
-	 * The AI's shots are communicated via the callback.
-	 *
-	 * @param gameId   path variable — the UUID from /register
-	 * @param request  { shots: [ {row, column}, ... ] }
-	 * @return         { results, shipsRemaining, gameStatus, winner }
-	 */
 	@PostMapping("/game/{gameId}/shots")
 	public ResponseEntity<?> receiveShots(@PathVariable String gameId,
 										  @RequestBody ShotRequest request) {
-
-		// ── 1. Lookup session ────────────────────────────────────────────────
 		GameSession session = registry.getSession(gameId);
+		ResponseEntity<ErrorResponse> sessionError = validateSession(gameId, session);
+		if (sessionError != null) {
+			return sessionError;
+		}
+
+		if (request.shots == null || request.shots.size() != Game.NUMBER_SHOTS) {
+			return error(HttpStatus.BAD_REQUEST,
+					"Exactly " + Game.NUMBER_SHOTS + " shots required per turn");
+		}
+
+		List<IPosition> positions = new ArrayList<>();
+		ResponseEntity<ErrorResponse> positionError = parseAndValidatePositions(request.shots, positions);
+		if (positionError != null) {
+			return positionError;
+		}
+
+		IGame game = session.getGame();
+		ShotResponse m1bResponse = evaluateShots(positions, game);
+
+		if (game.getRemainingShips() == 0) {
+			session.markStudentWins();
+			m1bResponse.gameStatus = STATUS_GAME_OVER;
+			m1bResponse.winner     = WINNER_STUDENT;
+			System.out.printf("[%s] GAME OVER — student '%s' wins!%n",
+					gameId, session.getPlayerName());
+			return ResponseEntity.ok(m1bResponse);
+		}
+
+		triggerAiTurn(gameId, session, game);
+		return ResponseEntity.ok(m1bResponse);
+	}
+
+	private ResponseEntity<ErrorResponse> validateSession(String gameId, GameSession session) {
 		if (session == null) {
 			return error(HttpStatus.NOT_FOUND, "Game not found: " + gameId);
 		}
 		if (session.isGameOver()) {
 			return error(HttpStatus.GONE, "Game " + gameId + " is already over. Winner: " + session.getWinner());
 		}
+		return null;
+	}
 
-		// ── 2. Validate incoming shots ───────────────────────────────────────
-		if (request.shots == null || request.shots.size() != Game.NUMBER_SHOTS) {
-			return error(HttpStatus.BAD_REQUEST,
-					"Exactly " + Game.NUMBER_SHOTS + " shots required per turn");
-		}
-
-		// ── 3. Convert DTO positions → IPosition list ────────────────────────
-		List<IPosition> positions = new ArrayList<>();
-		for (ShotPosition sp : request.shots) {
-			if (sp.row == null || sp.row.isBlank() || sp.column < 1 || sp.column > 10) {
+	private ResponseEntity<ErrorResponse> parseAndValidatePositions(List<ShotPosition> shotDtos,
+																	List<IPosition> targetPositions) {
+		for (ShotPosition sp : shotDtos) {
+			if (sp.row == null || sp.row.isBlank() || sp.column < MIN_COLUMN || sp.column > MAX_COLUMN) {
 				return error(HttpStatus.BAD_REQUEST,
 						"Invalid position: row='" + sp.row + "' column=" + sp.column);
 			}
-			positions.add(new Position(sp.row.toUpperCase().charAt(0), sp.column));
+			targetPositions.add(new Position(sp.row.toUpperCase().charAt(0), sp.column));
 		}
+		return null;
+	}
 
-		// ── 4. Fire student's shots at the AI's fleet (m1b logic) ────────────
-		IGame game = session.getGame();
-		ShotResponse m1bResponse = evaluateShots(positions, game, session);
-
-		// ── 5. Check if student won (all AI ships sunk) ──────────────────────
-		if (game.getRemainingShips() == 0) {
-			session.markStudentWins();
-			m1bResponse.gameStatus = "GAME_OVER";
-			m1bResponse.winner     = "STUDENT_WINS";
-			System.out.printf("[%s] GAME OVER — student '%s' wins!%n",
-					gameId, session.getPlayerName());
-			return ResponseEntity.ok(m1bResponse);
-		}
-
-		// ── 6. AI fires back — calls student's callback (m2a + m2b) ─────────
+	private void triggerAiTurn(String gameId, GameSession session, IGame game) {
 		List<IPosition> aiShots = aiStrategy.computeShots(game);
 		boolean callbackOk = callbackClient.sendShots(session, aiShots);
 
 		if (!callbackOk) {
-			// Callback failed — warn but don't crash the student's turn
 			System.err.printf("[%s] WARNING: callback to '%s' failed. AI shots skipped.%n",
 					gameId, session.getCallbackUrl());
 		}
-
-		// ── 7. Return m1b to student ─────────────────────────────────────────
-		return ResponseEntity.ok(m1bResponse);
 	}
 
-	// =========================================================================
-	// Helpers
-	// =========================================================================
-
-	/**
-	 * Fires each position against the AI's fleet and builds the ShotResponse (m1b).
-	 * Delegates to the existing Game.fireSingleShot() so all existing logic is reused.
-	 */
-	private ShotResponse evaluateShots(List<IPosition> positions,
-									   IGame game,
-									   GameSession session) {
+	private ShotResponse evaluateShots(List<IPosition> positions, IGame game) {
 		List<ShotResult> results = new ArrayList<>();
 		List<IPosition> alreadyThisTurn = new ArrayList<>();
 
@@ -162,35 +145,38 @@ public class GameController {
 			IGame.ShotResult sr = game.fireSingleShot(pos, repeatedInTurn);
 			alreadyThisTurn.add(pos);
 
-			ShotResult dto  = new ShotResult();
-			dto.row         = String.valueOf(pos.getClassicRow());
-			dto.column      = pos.getClassicColumn();
-
-			if (!sr.valid()) {
-				dto.outcome = "INVALID";
-			} else if (sr.repeated()) {
-				dto.outcome = "REPEATED";
-			} else if (sr.ship() == null) {
-				dto.outcome = "MISS";
-			} else if (sr.sunk()) {
-				dto.outcome  = "SUNK";
-				dto.shipType = sr.ship().getCategory();
-			} else {
-				dto.outcome  = "HIT";
-				dto.shipType = sr.ship().getCategory();
-			}
-			results.add(dto);
+			results.add(buildShotResultDto(pos, sr));
 		}
 
 		ShotResponse response  = new ShotResponse();
 		response.results       = results;
 		response.shipsRemaining = game.getRemainingShips();
-		response.gameStatus    = "ONGOING";
+		response.gameStatus    = STATUS_ONGOING;
 		response.winner        = null;
 		return response;
 	}
 
-	/** Convenience helper to build a JSON error response. */
+	private ShotResult buildShotResultDto(IPosition pos, IGame.ShotResult sr) {
+		ShotResult dto = new ShotResult();
+		dto.row        = String.valueOf(pos.getClassicRow());
+		dto.column     = pos.getClassicColumn();
+
+		if (!sr.valid()) {
+			dto.outcome = OUTCOME_INVALID;
+		} else if (sr.repeated()) {
+			dto.outcome = OUTCOME_REPEATED;
+		} else if (sr.ship() == null) {
+			dto.outcome = OUTCOME_MISS;
+		} else if (sr.sunk()) {
+			dto.outcome  = OUTCOME_SUNK;
+			dto.shipType = sr.ship().getCategory();
+		} else {
+			dto.outcome  = OUTCOME_HIT;
+			dto.shipType = sr.ship().getCategory();
+		}
+		return dto;
+	}
+
 	private ResponseEntity<ErrorResponse> error(HttpStatus status, String message) {
 		return ResponseEntity.status(status).body(new ErrorResponse(message));
 	}
