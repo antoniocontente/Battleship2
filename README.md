@@ -176,7 +176,7 @@ O repositório tem um workflow em `.github/workflows/maven.yml`, criado a partir
 
 **O que faz**
 1. Faz checkout do código;
-2. Configura o JDK 17 (Temurin) com cache das dependências Maven;
+2. Configura o JDK 21 (Temurin) com cache das dependências Maven;
 3. Executa `mvn -B clean test`, que compila o projeto e corre toda a bateria de testes JUnit 5 em `src/test/java`;
 4. Guarda os relatórios do Surefire (`target/surefire-reports`) como artefacto, mesmo quando há testes a falhar.
 
