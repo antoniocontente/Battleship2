@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class PDFReportGenerator {
 
+    public static final int LINE_SPACING = -20;
+
     public static void generateReport(String filePath, String winner, int totalShots, int sunkShips, double accuracy) {
         File file = new File(filePath);
         if (file.getParentFile() != null) {
@@ -32,11 +34,11 @@ public class PDFReportGenerator {
                 // Estatísticas da partida
                 stream.setFont(PDType1Font.HELVETICA, 12);
                 stream.showText("Vencedor: " + winner);
-                stream.newLineAtOffset(0, -20);
+                stream.newLineAtOffset(0, LINE_SPACING);
                 stream.showText("Total de tiros/jogadas: " + totalShots);
-                stream.newLineAtOffset(0, -20);
+                stream.newLineAtOffset(0, LINE_SPACING);
                 stream.showText("Navios afundados: " + sunkShips);
-                stream.newLineAtOffset(0, -20);
+                stream.newLineAtOffset(0, LINE_SPACING);
                 stream.showText(String.format("Precisao: %.2f%%", accuracy));
                 stream.newLineAtOffset(0, -35);
 
