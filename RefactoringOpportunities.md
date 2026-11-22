@@ -8,5 +8,5 @@ Ficheiro criado por: LETI-122652 . Cada membro do grupo aplica entre 5 e 10 refa
 | `PDFReportGenerator::generateReport` | Números mágicos (Magic Number) | Introduce Constant | 122652 |
 | `Move::processEnemyFire` | Long Method | Extract Method | 122652 |
 | `Move::processEnemyFire` | Objeto criado em cada chamada (`new ObjectMapper()`) | Introduce Field | 122652 |
-| `Move::processEnemyFire` | Variável temporária desnecessária (`jsonString`) | Inline Variable | 122652 |
+| `Move::processEnemyFire` | Variável temporária desnecessária (`boatName`, no ciclo dos navios afundados) | Inline Variable | 122652 |
 | `Game` (parâmetros `show_shots`, `show_legend`) | Nomes fora da convenção (Checkstyle `ParameterName`) | Rename | 122652 |
