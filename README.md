@@ -163,3 +163,24 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ---
 **Maintained by:** [@britoeabreu](https://github.com/britoeabreu)  
 *Created for the Software Engineering students at ISCTE-IUL.*
+
+## Integração contínua – GitHub Actions (Java with Maven)
+
+O repositório tem um workflow em `.github/workflows/maven.yml`, criado a partir do modelo
+**"Java with Maven – Build and test a Java project with Apache Maven"** do GitHub Actions.
+
+**Quando corre**
+- Em cada `push` para qualquer ramo (incluindo `main`, `UnitTests_XXXXXX` e `Refactoring_XXXXXX`);
+- Em cada Pull Request para o `main`;
+- Manualmente, no separador *Actions* → *Java CI with Maven* → *Run workflow*.
+
+**O que faz**
+1. Faz checkout do código;
+2. Configura o JDK 17 (Temurin) com cache das dependências Maven;
+3. Executa `mvn -B clean test`, que compila o projeto e corre toda a bateria de testes JUnit 5 em `src/test/java`;
+4. Guarda os relatórios do Surefire (`target/surefire-reports`) como artefacto, mesmo quando há testes a falhar.
+
+Se algum teste falhar, o workflow termina com erro e o commit/PR fica marcado a vermelho,
+o que permite detetar efeitos colaterais das alterações (por exemplo, depois de uma refabricação).
+
+![Java CI with Maven](https://github.com/antoniocontente/Battleship2/actions/workflows/maven.yml/badge.svg)
