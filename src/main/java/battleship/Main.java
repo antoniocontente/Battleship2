@@ -1,14 +1,19 @@
+/**
+ * 
+ */
 package battleship;
 
-public class Main {
-
+public class Main
+{
 	/**
-	 * Main entry point for the Battleship game.
+	 * Main.
 	 *
-	 * @param args the command line arguments
+	 * @param args the args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args)
+    {
 		System.out.println("***  Battleship  ***");
+
 		Tasks.menu();
-	}
+    }
 }

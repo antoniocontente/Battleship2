@@ -1,0 +1,321 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SaveGameManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship</a>
+</div>
+
+<h1>Coverage Summary for Class: SaveGameManager (battleship)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SaveGameManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95,8%
+  </span>
+  <span class="absValue">
+    (23/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (51/51)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SaveGameManager$GameState</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SaveGameManager$MoveData</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SaveGameManager$ShipData</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SaveGameManager$ShotData</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95,8%
+  </span>
+  <span class="absValue">
+    (23/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (55/55)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import com.fasterxml.jackson.databind.SerializationFeature;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Guarda e carrega o estado de uma partida em formato JSON (biblioteca Jackson).
+&nbsp; * O estado guardado é a frota e as rajadas já disparadas; ao carregar, as rajadas
+&nbsp; * são repetidas sobre a frota para recalcular acertos, afundados e contadores.
+&nbsp; */
+<b class="fc">&nbsp;public class SaveGameManager {</b>
+&nbsp;
+&nbsp;    public static final String SAVE_DIR = &quot;saves&quot;;
+&nbsp;    public static final String DEFAULT_FILE = &quot;savegame.json&quot;;
+&nbsp;
+<b class="fc">&nbsp;    public record ShipData(String category, String bearing, int row, int column) {}</b>
+<b class="fc">&nbsp;    public record ShotData(int row, int column) {}</b>
+<b class="fc">&nbsp;    public record MoveData(int number, List&lt;ShotData&gt; shots) {}</b>
+<b class="fc">&nbsp;    public record GameState(List&lt;ShipData&gt; ships,</b>
+&nbsp;                            List&lt;MoveData&gt; moves,
+&nbsp;                            int totalMoves,
+&nbsp;                            int hits,
+&nbsp;                            int sunkShips,
+&nbsp;                            int repeatedShots,
+&nbsp;                            int invalidShots) {}
+&nbsp;
+<b class="fc">&nbsp;    private static final ObjectMapper MAPPER = new ObjectMapper()</b>
+<b class="fc">&nbsp;            .enable(SerializationFeature.INDENT_OUTPUT);</b>
+&nbsp;
+&nbsp;    /** Grava o estado do jogo em saves/savegame.json. */
+&nbsp;    public static Path save(IGame game) throws IOException {
+<b class="pc">&nbsp;        assert game != null;</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;ShipData&gt; ships = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (IShip ship : game.getMyFleet().getShips())</b>
+<b class="fc">&nbsp;            ships.add(new ShipData(</b>
+<b class="fc">&nbsp;                    ship.getCategory(),</b>
+<b class="fc">&nbsp;                    ship.getBearing().name(),</b>
+<b class="fc">&nbsp;                    ship.getPosition().getRow(),</b>
+<b class="fc">&nbsp;                    ship.getPosition().getColumn()));</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;MoveData&gt; moves = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        int number = 1;</b>
+<b class="fc">&nbsp;        for (IMove move : game.getAlienMoves()) {</b>
+<b class="fc">&nbsp;            List&lt;ShotData&gt; shots = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;            for (IPosition shot : move.getShots())</b>
+<b class="fc">&nbsp;                shots.add(new ShotData(shot.getRow(), shot.getColumn()));</b>
+<b class="fc">&nbsp;            moves.add(new MoveData(number++, shots));</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        GameState state = new GameState(ships, moves, moves.size(),</b>
+<b class="fc">&nbsp;                game.getHits(), game.getSunkShips(),</b>
+<b class="fc">&nbsp;                game.getRepeatedShots(), game.getInvalidShots());</b>
+&nbsp;
+<b class="fc">&nbsp;        Path dir = Path.of(SAVE_DIR);</b>
+<b class="fc">&nbsp;        Files.createDirectories(dir);</b>
+<b class="fc">&nbsp;        Path file = dir.resolve(DEFAULT_FILE);</b>
+<b class="fc">&nbsp;        MAPPER.writeValue(file.toFile(), state);</b>
+<b class="fc">&nbsp;        return file;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Lê saves/savegame.json e reconstrói o jogo. */
+&nbsp;    public static Game load() throws IOException {
+<b class="fc">&nbsp;        File file = Path.of(SAVE_DIR, DEFAULT_FILE).toFile();</b>
+<b class="fc">&nbsp;        if (!file.exists())</b>
+<b class="fc">&nbsp;            throw new IOException(&quot;Não existe nenhum jogo guardado (&quot; + file.getPath() + &quot;).&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        GameState state = MAPPER.readValue(file, GameState.class);</b>
+<b class="fc">&nbsp;        if (state.ships() == null || state.moves() == null)</b>
+<b class="fc">&nbsp;            throw new IOException(&quot;Ficheiro de jogo inválido: faltam navios ou jogadas.&quot;);</b>
+&nbsp;
+&nbsp;        // 1. Reconstruir a frota
+<b class="fc">&nbsp;        Fleet fleet = new Fleet();</b>
+<b class="fc">&nbsp;        for (ShipData data : state.ships()) {</b>
+&nbsp;            Compass bearing;
+&nbsp;            try {
+<b class="fc">&nbsp;                bearing = Compass.valueOf(data.bearing());</b>
+&nbsp;            } catch (IllegalArgumentException e) {
+<b class="fc">&nbsp;                throw new IOException(&quot;Orientação inválida no ficheiro: &quot; + data.bearing());</b>
+&nbsp;            }
+<b class="fc">&nbsp;            Ship ship = Ship.buildShip(data.category().toLowerCase(), bearing, new Position(data.row(), data.column()));            if (ship == null)</b>
+<b class="fc">&nbsp;                throw new IOException(&quot;Tipo de navio desconhecido: &quot; + data.category());</b>
+<b class="fc">&nbsp;            if (!fleet.addShip(ship))</b>
+<b class="fc">&nbsp;                throw new IOException(&quot;Navio inválido ou em colisão: &quot; + data.category());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // 2. Criar o jogo e repetir as rajadas (sem imprimir as mensagens antigas)
+<b class="fc">&nbsp;        Game game = new Game(fleet);</b>
+<b class="fc">&nbsp;        PrintStream originalOut = System.out;</b>
+<b class="fc">&nbsp;        System.setOut(new PrintStream(OutputStream.nullOutputStream()));</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            for (MoveData move : state.moves()) {</b>
+<b class="fc">&nbsp;                List&lt;IPosition&gt; shots = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;                for (ShotData shot : move.shots())</b>
+<b class="fc">&nbsp;                    shots.add(new Position(shot.row(), shot.column()));</b>
+<b class="fc">&nbsp;                game.fireShots(shots);</b>
+&nbsp;            }
+&nbsp;        } catch (IllegalArgumentException e) {
+<b class="fc">&nbsp;            throw new IOException(&quot;Rajada inválida no ficheiro: &quot; + e.getMessage());</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            System.setOut(originalOut);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return game;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-11-22 15:25</div>
+</div>
+</body>
+</html>

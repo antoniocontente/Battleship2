@@ -1,29 +1,39 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
+# Workflow "Java with Maven" (modelo do GitHub Actions:
+# "Build and test a Java project with Apache Maven"), adaptado para a Ficha 4.
+# Corre a bateria de testes unitários em cada push para qualquer ramo
+# (main, UnitTests_XXXXXX, Refactoring_XXXXXX, ...) e em cada Pull Request para o main.
 
 name: Java CI with Maven
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "**" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
 
-    - name: Build and Test with Maven
-      run: mvn -B package --file pom.xml
+      - name: Compilar e correr os testes unitários
+        run: mvn -B clean test --file pom.xml
+
+      - name: Guardar relatórios dos testes (Surefire)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/
+          if-no-files-found: ignore
