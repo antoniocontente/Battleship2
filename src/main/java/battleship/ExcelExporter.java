@@ -3,6 +3,7 @@ package battleship;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -77,8 +78,9 @@ public class ExcelExporter {
 
         // Assegurar que a pasta de destino existe
         java.io.File file = new java.io.File(caminhoFicheiro);
-        if (file.getParentFile() != null) {
-            file.getParentFile().mkdirs();
+        File parentDir = file.getParentFile();
+        if (parentDir != null) {
+            parentDir.mkdirs();
         }
 
         // Gravar no ficheiro
