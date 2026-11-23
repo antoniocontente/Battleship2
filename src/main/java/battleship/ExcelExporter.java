@@ -59,8 +59,8 @@ public class ExcelExporter {
                 row.createCell(2).setCellValue(posicoesStr);
 
                 // Quantidade de tiros
-                int numShots = (move.getShots() != null) ? move.getShots().size() : 0;
-                row.createCell(3).setCellValue(numShots);
+
+                row.createCell(3).setCellValue((move.getShots() != null) ? move.getShots().size() : 0);
 
                 // Detalhe de cada resultado
                 formatarResultados(move, row);
