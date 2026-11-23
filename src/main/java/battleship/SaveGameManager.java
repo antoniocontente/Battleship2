@@ -41,12 +41,14 @@ public class SaveGameManager {
         assert game != null;
 
         List<ShipData> ships = new ArrayList<>();
-        for (IShip ship : game.getMyFleet().getShips())
+        for (IShip ship : game.getMyFleet().getShips()) {
+            IPosition pos = ship.getPosition();
             ships.add(new ShipData(
                     ship.getCategory(),
                     ship.getBearing().name(),
-                    ship.getPosition().getRow(),
-                    ship.getPosition().getColumn()));
+                    pos.getRow(),
+                    pos.getColumn()));
+        }
 
         List<MoveData> moves = new ArrayList<>();
         int number = 1;
