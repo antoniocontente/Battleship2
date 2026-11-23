@@ -12,6 +12,7 @@ import battleship.IGame;
  */
 public class GameSession {
 
+	public static final String AI_WINS = "AI_WINS";
 	/** Unique identifier for this game, returned to the student on registration. */
 	private final String gameId;
 
@@ -67,7 +68,7 @@ public class GameSession {
 
 	public void markAiWins() {
 		this.gameOver = true;
-		this.winner   = "AI_WINS";
+		this.winner   = AI_WINS;
 	}
 
 	public void markStudentWins() {
