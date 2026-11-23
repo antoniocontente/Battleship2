@@ -1,0 +1,88 @@
+{
+  "ships" : [ {
+    "category" : "Galeao",
+    "bearing" : "EAST",
+    "row" : 3,
+    "column" : 5
+  }, {
+    "category" : "Fragata",
+    "bearing" : "NORTH",
+    "row" : 1,
+    "column" : 7
+  }, {
+    "category" : "Nau",
+    "bearing" : "NORTH",
+    "row" : 1,
+    "column" : 0
+  }, {
+    "category" : "Nau",
+    "bearing" : "NORTH",
+    "row" : 2,
+    "column" : 9
+  }, {
+    "category" : "Caravela",
+    "bearing" : "EAST",
+    "row" : 1,
+    "column" : 3
+  }, {
+    "category" : "Caravela",
+    "bearing" : "WEST",
+    "row" : 9,
+    "column" : 8
+  }, {
+    "category" : "Caravela",
+    "bearing" : "EAST",
+    "row" : 7,
+    "column" : 4
+  }, {
+    "category" : "Barca",
+    "bearing" : "NORTH",
+    "row" : 7,
+    "column" : 0
+  }, {
+    "category" : "Barca",
+    "bearing" : "SOUTH",
+    "row" : 6,
+    "column" : 7
+  }, {
+    "category" : "Barca",
+    "bearing" : "NORTH",
+    "row" : 9,
+    "column" : 4
+  }, {
+    "category" : "Barca",
+    "bearing" : "NORTH",
+    "row" : 6,
+    "column" : 2
+  } ],
+  "moves" : [ {
+    "number" : 1,
+    "shots" : [ {
+      "row" : 6,
+      "column" : 2
+    }, {
+      "row" : 6,
+      "column" : 3
+    }, {
+      "row" : 6,
+      "column" : 4
+    } ]
+  }, {
+    "number" : 2,
+    "shots" : [ {
+      "row" : 7,
+      "column" : 0
+    }, {
+      "row" : 7,
+      "column" : 2
+    }, {
+      "row" : 7,
+      "column" : 3
+    } ]
+  } ],
+  "totalMoves" : 2,
+  "hits" : 2,
+  "sunkShips" : 2,
+  "repeatedShots" : 0,
+  "invalidShots" : 0
+}

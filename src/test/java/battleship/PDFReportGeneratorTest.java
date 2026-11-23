@@ -63,7 +63,7 @@ public class PDFReportGeneratorTest {
     void testGenerateReportInExistingFolder() {
         File pdf = tempDir.resolve("relatorio.pdf").toFile();
 
-        PDFReportGenerator.generateReport(pdf.getPath(), "Jogador", 25, 11, 80.0);
+        PDFReportGenerator.generateReport(pdf.getPath(), new MatchStats("Jogador", 25, 11, 80.0));
 
         assertTrue(pdf.exists(), "O ficheiro PDF devia ter sido criado");
         assertTrue(pdf.length() > 0, "O ficheiro PDF não devia estar vazio");
@@ -75,7 +75,7 @@ public class PDFReportGeneratorTest {
         File pdf = tempDir.resolve("reports").resolve("sub").resolve("relatorio.pdf").toFile();
         assertFalse(pdf.getParentFile().exists(), "Pré-condição: a pasta ainda não existe");
 
-        PDFReportGenerator.generateReport(pdf.getPath(), "Jogador", 25, 11, 80.0);
+        PDFReportGenerator.generateReport(pdf.getPath(), new MatchStats("Jogador", 25, 11, 80.0));
 
         assertTrue(pdf.getParentFile().isDirectory(), "As pastas deviam ter sido criadas");
         assertTrue(pdf.exists(), "O ficheiro PDF devia ter sido criado");
@@ -88,7 +88,7 @@ public class PDFReportGeneratorTest {
         File pdf = new File(fileName);
         assertNull(pdf.getParentFile(), "Pré-condição: o caminho não tem pasta");
         try {
-            PDFReportGenerator.generateReport(fileName, "Jogador", 1, 1, 100.0);
+            PDFReportGenerator.generateReport(fileName, new MatchStats("Jogador", 1, 1, 100.0));
             assertTrue(pdf.exists(), "O ficheiro PDF devia ter sido criado na pasta de trabalho");
         } finally {
             Files.deleteIfExists(pdf.toPath());
@@ -100,7 +100,7 @@ public class PDFReportGeneratorTest {
     void testGeneratedPdfHasOnePage() throws IOException {
         File pdf = tempDir.resolve("relatorio.pdf").toFile();
 
-        PDFReportGenerator.generateReport(pdf.getPath(), "Jogador", 25, 11, 80.0);
+        PDFReportGenerator.generateReport(pdf.getPath(), new MatchStats("Jogador", 25, 11, 80.0));
 
         try (PDDocument document = PDDocument.load(pdf)) {
             assertEquals(1, document.getNumberOfPages());
@@ -112,7 +112,7 @@ public class PDFReportGeneratorTest {
     void testGeneratedPdfContent() throws IOException {
         File pdf = tempDir.resolve("relatorio.pdf").toFile();
 
-        PDFReportGenerator.generateReport(pdf.getPath(), "Computador", 42, 7, 66.666);
+        PDFReportGenerator.generateReport(pdf.getPath(), new MatchStats("Computador", 42, 7, 66.666));
 
         String text = readPdfText(pdf);
         assertAll(
@@ -131,7 +131,7 @@ public class PDFReportGeneratorTest {
     void testGenerateReportWithZeroValues() throws IOException {
         File pdf = tempDir.resolve("zeros.pdf").toFile();
 
-        PDFReportGenerator.generateReport(pdf.getPath(), "Ninguém", 0, 0, 0.0);
+        PDFReportGenerator.generateReport(pdf.getPath(), new MatchStats("Ninguém", 0, 0, 0.0));
 
         String text = readPdfText(pdf);
         assertTrue(text.contains("Total de tiros/jogadas: 0"));
@@ -144,7 +144,7 @@ public class PDFReportGeneratorTest {
     void testGenerateReportPrintsSuccessMessage() {
         File pdf = tempDir.resolve("relatorio.pdf").toFile();
 
-        PDFReportGenerator.generateReport(pdf.getPath(), "Jogador", 25, 11, 80.0);
+        PDFReportGenerator.generateReport(pdf.getPath(), new MatchStats("Jogador", 25, 11, 80.0));
 
         assertTrue(outContent.toString().contains("[INFO] Relatorio em PDF gerado com sucesso em: " + pdf.getPath()));
         assertFalse(errContent.toString().contains("[ERRO]"), "Não devia haver mensagens de erro");
@@ -155,8 +155,8 @@ public class PDFReportGeneratorTest {
     void testGenerateReportOverwritesExistingFile() throws IOException {
         File pdf = tempDir.resolve("relatorio.pdf").toFile();
 
-        PDFReportGenerator.generateReport(pdf.getPath(), "Primeiro", 1, 1, 10.0);
-        PDFReportGenerator.generateReport(pdf.getPath(), "Segundo", 2, 2, 20.0);
+        PDFReportGenerator.generateReport(pdf.getPath(), new MatchStats("Primeiro", 1, 1, 10.0));
+        PDFReportGenerator.generateReport(pdf.getPath(), new MatchStats("Segundo", 2, 2, 20.0));
 
         String text = readPdfText(pdf);
         assertTrue(text.contains("Vencedor: Segundo"));
@@ -171,7 +171,7 @@ public class PDFReportGeneratorTest {
         assertTrue(notAFolder.createNewFile());
         File pdf = new File(notAFolder, "relatorio.pdf");
 
-        assertDoesNotThrow(() -> PDFReportGenerator.generateReport(pdf.getPath(), "Jogador", 25, 11, 80.0));
+        assertDoesNotThrow(() -> PDFReportGenerator.generateReport(pdf.getPath(), new MatchStats("Jogador", 25, 11, 80.0)));
 
         assertFalse(pdf.exists(), "O ficheiro PDF não devia ter sido criado");
         assertTrue(errContent.toString().contains("[ERRO] Nao foi possivel gerar o relatorio PDF"),

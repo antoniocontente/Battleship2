@@ -3,6 +3,7 @@ package battleship;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -19,6 +20,7 @@ public class Move implements IMove {
 	private final int number;
 	private final List<IPosition> shots;
 	private final List<IGame.ShotResult> shotResults;
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	//-------------------------------------------------------------------
 	public Move(int moveNumber, List<IPosition> moveShots, List<IGame.ShotResult> moveResults) {
@@ -112,9 +114,8 @@ public class Move implements IMove {
 				// Atualizar lógica para contar múltiplos barcos afundados do mesmo tipo
 				if (!sunkBoatsCount.isEmpty()) {
 					for (Map.Entry<String, Integer> entry : sunkBoatsCount.entrySet()) {
-						String boatName = entry.getKey();
-						int count = entry.getValue();
-						output.append(count).append(" ").append(boatName).append(count > 1 ? "s" : "").append(" ao fundo").append(" + ");
+                        int count = entry.getValue();
+						output.append(count).append(" ").append(entry.getKey()).append(count > 1 ? "s" : "").append(" ao fundo").append(" + ");
 					}
 				}
 
@@ -162,13 +163,7 @@ public class Move implements IMove {
 		response.put("missedShots", missedShots);
 
 		// Criar a lista de barcos afundados
-		List<Map<String, Object>> sunkBoats = new ArrayList<>();
-		for (Map.Entry<String, Integer> entry : sunkBoatsCount.entrySet()) {
-			Map<String, Object> boat = new HashMap<>();
-			boat.put("type", entry.getKey());
-			boat.put("count", entry.getValue());
-			sunkBoats.add(boat);
-		}
+		List<Map<String, Object>> sunkBoats = buildSunkBoatsList(sunkBoatsCount);
 		response.put("sunkBoats", sunkBoats);
 
 		// Criar a lista de acertos em barcos que não foram afundados
@@ -187,7 +182,6 @@ public class Move implements IMove {
 		String jsonString;
 
 		// Serializar os tiros gerados em JSON usando a biblioteca Jackson
-		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
 		try {
@@ -196,10 +190,23 @@ public class Move implements IMove {
 			throw new RuntimeException("Erro ao serializar o JSON dos resultados da jogada", e);
 		}
 
+		System.out.println("==================== JSON (RESULTADO DO TIRO) ====================");
 		System.out.println(jsonString);
+		System.out.println("===================================================================");
 		System.out.println();
 
 		// Retornar o JSON
 		return jsonString;
+	}
+
+	private static @NotNull List<Map<String, Object>> buildSunkBoatsList(Map<String, Integer> sunkBoatsCount) {
+		List<Map<String, Object>> sunkBoats = new ArrayList<>();
+		for (Map.Entry<String, Integer> entry : sunkBoatsCount.entrySet()) {
+			Map<String, Object> boat = new HashMap<>();
+			boat.put("type", entry.getKey());
+			boat.put("count", entry.getValue());
+			sunkBoats.add(boat);
+		}
+		return sunkBoats;
 	}
 }

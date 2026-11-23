@@ -1,0 +1,25 @@
+# 122652 - Gonçalo Gonçalves
+name: Checkstyle naming gate 122652 (ParameterName)
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  checkstyle-122652:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkstyle (ParameterName)
+        uses: dbelyaev/action-checkstyle@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          checkstyle_config: checkstyle-122652.xml
+          reporter: github-pr-check
+          level: error
+          fail_level: error
