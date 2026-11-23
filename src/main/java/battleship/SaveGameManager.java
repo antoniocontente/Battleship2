@@ -102,17 +102,17 @@ public class SaveGameManager {
     }
 
     private static void buildFleet(GameState state, Fleet fleet) throws IOException {
-        for (ShipData data : state.ships()) {
+        for (ShipData shipData : state.ships()) {
             Compass bearing;
             try {
-                bearing = Compass.valueOf(data.bearing());
+                bearing = Compass.valueOf(shipData.bearing());
             } catch (IllegalArgumentException e) {
-                throw new IOException("Orientação inválida no ficheiro: " + data.bearing());
+                throw new IOException("Orientação inválida no ficheiro: " + shipData.bearing());
             }
-            Ship ship = Ship.buildShip(data.category().toLowerCase(), bearing, new Position(data.row(), data.column()));            if (ship == null)
-                throw new IOException("Tipo de navio desconhecido: " + data.category());
+            Ship ship = Ship.buildShip(shipData.category().toLowerCase(), bearing, new Position(shipData.row(), shipData.column()));            if (ship == null)
+                throw new IOException("Tipo de navio desconhecido: " + shipData.category());
             if (!fleet.addShip(ship))
-                throw new IOException("Navio inválido ou em colisão: " + data.category());
+                throw new IOException("Navio inválido ou em colisão: " + shipData.category());
         }
     }
 }
