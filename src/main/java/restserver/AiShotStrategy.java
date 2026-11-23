@@ -19,6 +19,8 @@ import java.util.*;
 @Component
 public class AiShotStrategy {
 
+	private Random random;
+
 	/**
 	 * Compute the next set of AI shots based on current game knowledge.
 	 *
@@ -57,7 +59,8 @@ public class AiShotStrategy {
 		// ── Phase 1 HUNT: fill remaining slots from checkerboard pattern ────
 		if (chosen.size() < Game.NUMBER_SHOTS) {
 			List<IPosition> huntPool = buildHuntPool(alreadyShot, chosen);
-			Collections.shuffle(huntPool, new Random(System.currentTimeMillis()));
+			random = new Random(System.currentTimeMillis());
+			Collections.shuffle(huntPool, random);
 			for (IPosition p : huntPool) {
 				if (chosen.size() >= Game.NUMBER_SHOTS) break;
 				chosen.add(p);
@@ -117,13 +120,13 @@ public class AiShotStrategy {
 	 * Using only cells where (row + col) % 2 == 0 means minimum ship size 2
 	 * (Barca) will always intersect at least one cell — halves the search space.
 	 */
-	private List<IPosition> buildHuntPool(Set<IPosition> alreadyShot, List<IPosition> alreadyChosen) {
+	private List<IPosition> buildHuntPool(Set<IPosition> alreadyShot, List<IPosition> chosen) {
 		List<IPosition> pool = new ArrayList<>();
 		for (int r = 0; r < Game.BOARD_SIZE; r++) {
 			for (int c = 0; c < Game.BOARD_SIZE; c++) {
 				if ((r + c) % 2 == 0) {
 					IPosition p = new Position(r, c);
-					if (!alreadyShot.contains(p) && !alreadyChosen.contains(p)) {
+					if (!alreadyShot.contains(p) && !chosen.contains(p)) {
 						pool.add(p);
 					}
 				}

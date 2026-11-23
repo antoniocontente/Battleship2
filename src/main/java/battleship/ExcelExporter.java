@@ -3,6 +3,7 @@ package battleship;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,9 +11,11 @@ import java.util.List;
 
 public class ExcelExporter {
 
+    public static final String SHEETNAME = "Histórico de Jogadas";
+
     public static void exportarJogo(IGame game, String caminhoFicheiro) {
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Histórico de Jogadas");
+        Sheet sheet = workbook.createSheet(SHEETNAME);
 
         // Cabeçalho detalhado
         Row headerRow = sheet.createRow(0);
@@ -56,33 +59,11 @@ public class ExcelExporter {
                 row.createCell(2).setCellValue(posicoesStr);
 
                 // Quantidade de tiros
-                int numShots = (move.getShots() != null) ? move.getShots().size() : 0;
-                row.createCell(3).setCellValue(numShots);
+
+                row.createCell(3).setCellValue((move.getShots() != null) ? move.getShots().size() : 0);
 
                 // Detalhe de cada resultado
-                StringBuilder resultadosStr = new StringBuilder();
-                if (move.getShotResults() != null && !move.getShotResults().isEmpty()) {
-                    for (int j = 0; j < move.getShotResults().size(); j++) {
-                        IGame.ShotResult res = move.getShotResults().get(j);
-                        if (j > 0) {
-                            resultadosStr.append(", ");
-                        }
-                        if (res == null || !res.valid()) {
-                            resultadosStr.append("Inválido");
-                        } else if (res.repeated()) {
-                            resultadosStr.append("Repetido");
-                        } else if (res.ship() == null) {
-                            resultadosStr.append("Água");
-                        } else if (res.sunk()) {
-                            resultadosStr.append("Afundou (").append(res.ship().getCategory()).append(")");
-                        } else {
-                            resultadosStr.append("Acertou (").append(res.ship().getCategory()).append(")");
-                        }
-                    }
-                } else {
-                    resultadosStr.append("Sem resultados");
-                }
-                row.createCell(4).setCellValue(resultadosStr.toString());
+                formatarResultados(move, row);
             }
         } else {
             // Se ainda não houver jogadas registadas na memória
@@ -97,8 +78,9 @@ public class ExcelExporter {
 
         // Assegurar que a pasta de destino existe
         java.io.File file = new java.io.File(caminhoFicheiro);
-        if (file.getParentFile() != null) {
-            file.getParentFile().mkdirs();
+        File parentDir = file.getParentFile();
+        if (parentDir != null) {
+            parentDir.mkdirs();
         }
 
         // Gravar no ficheiro
@@ -108,5 +90,31 @@ public class ExcelExporter {
         } catch (IOException e) {
             System.err.println("Erro ao exportar o ficheiro Excel: " + e.getMessage());
         }
+    }
+
+    private static void formatarResultados(IMove move, Row row) {
+        StringBuilder resultadosStr = new StringBuilder();
+        if (move.getShotResults() != null && !move.getShotResults().isEmpty()) {
+            for (int j = 0; j < move.getShotResults().size(); j++) {
+                IGame.ShotResult res = move.getShotResults().get(j);
+                if (j > 0) {
+                    resultadosStr.append(", ");
+                }
+                if (res == null || !res.valid()) {
+                    resultadosStr.append("Inválido");
+                } else if (res.repeated()) {
+                    resultadosStr.append("Repetido");
+                } else if (res.ship() == null) {
+                    resultadosStr.append("Água");
+                } else if (res.sunk()) {
+                    resultadosStr.append("Afundou (").append(res.ship().getCategory()).append(")");
+                } else {
+                    resultadosStr.append("Acertou (").append(res.ship().getCategory()).append(")");
+                }
+            }
+        } else {
+            resultadosStr.append("Sem resultados");
+        }
+        row.createCell(4).setCellValue(resultadosStr.toString());
     }
 }
