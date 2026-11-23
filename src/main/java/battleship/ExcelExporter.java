@@ -10,9 +10,11 @@ import java.util.List;
 
 public class ExcelExporter {
 
+    public static final String SHEETNAME = "Histórico de Jogadas";
+
     public static void exportarJogo(IGame game, String caminhoFicheiro) {
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Histórico de Jogadas");
+        Sheet sheet = workbook.createSheet(SHEETNAME);
 
         // Cabeçalho detalhado
         Row headerRow = sheet.createRow(0);
