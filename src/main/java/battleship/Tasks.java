@@ -141,7 +141,7 @@ public class Tasks {
 
                         String caminhoPdf = "reports/relatorio_partida.pdf";
 
-                        PDFReportGenerator.generateReport(caminhoPdf, statusJogo, tirosTotais, afundados, precisao);
+                        PDFReportGenerator.generateReport(caminhoPdf, new MatchStats(statusJogo, tirosTotais, afundados, precisao));
                     } else {
                         System.out.println("Ainda não existe nenhum jogo em curso para gerar PDF!");
                     }
