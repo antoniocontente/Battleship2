@@ -117,13 +117,13 @@ public class AiShotStrategy {
 	 * Using only cells where (row + col) % 2 == 0 means minimum ship size 2
 	 * (Barca) will always intersect at least one cell — halves the search space.
 	 */
-	private List<IPosition> buildHuntPool(Set<IPosition> alreadyShot, List<IPosition> alreadyChosen) {
+	private List<IPosition> buildHuntPool(Set<IPosition> alreadyShot, List<IPosition> chosen) {
 		List<IPosition> pool = new ArrayList<>();
 		for (int r = 0; r < Game.BOARD_SIZE; r++) {
 			for (int c = 0; c < Game.BOARD_SIZE; c++) {
 				if ((r + c) % 2 == 0) {
 					IPosition p = new Position(r, c);
-					if (!alreadyShot.contains(p) && !alreadyChosen.contains(p)) {
+					if (!alreadyShot.contains(p) && !chosen.contains(p)) {
 						pool.add(p);
 					}
 				}
