@@ -80,18 +80,7 @@ public class SaveGameManager {
 
         // 1. Reconstruir a frota
         Fleet fleet = new Fleet();
-        for (ShipData data : state.ships()) {
-            Compass bearing;
-            try {
-                bearing = Compass.valueOf(data.bearing());
-            } catch (IllegalArgumentException e) {
-                throw new IOException("Orientação inválida no ficheiro: " + data.bearing());
-            }
-            Ship ship = Ship.buildShip(data.category().toLowerCase(), bearing, new Position(data.row(), data.column()));            if (ship == null)
-                throw new IOException("Tipo de navio desconhecido: " + data.category());
-            if (!fleet.addShip(ship))
-                throw new IOException("Navio inválido ou em colisão: " + data.category());
-        }
+        buildFleet(state, fleet);
 
         // 2. Criar o jogo e repetir as rajadas (sem imprimir as mensagens antigas)
         Game game = new Game(fleet);
@@ -110,5 +99,20 @@ public class SaveGameManager {
             System.setOut(originalOut);
         }
         return game;
+    }
+
+    private static void buildFleet(GameState state, Fleet fleet) throws IOException {
+        for (ShipData data : state.ships()) {
+            Compass bearing;
+            try {
+                bearing = Compass.valueOf(data.bearing());
+            } catch (IllegalArgumentException e) {
+                throw new IOException("Orientação inválida no ficheiro: " + data.bearing());
+            }
+            Ship ship = Ship.buildShip(data.category().toLowerCase(), bearing, new Position(data.row(), data.column()));            if (ship == null)
+                throw new IOException("Tipo de navio desconhecido: " + data.category());
+            if (!fleet.addShip(ship))
+                throw new IOException("Navio inválido ou em colisão: " + data.category());
+        }
     }
 }
