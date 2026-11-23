@@ -59,14 +59,12 @@ public class SaveGameManager {
             moves.add(new MoveData(number++, shots));
         }
 
-        GameState state = new GameState(ships, moves, moves.size(),
-                game.getHits(), game.getSunkShips(),
-                game.getRepeatedShots(), game.getInvalidShots());
-
         Path dir = Path.of(SAVE_DIR);
         Files.createDirectories(dir);
         Path file = dir.resolve(DEFAULT_FILE);
-        MAPPER.writeValue(file.toFile(), state);
+        MAPPER.writeValue(file.toFile(), new GameState(ships, moves, moves.size(),
+                game.getHits(), game.getSunkShips(),
+                game.getRepeatedShots(), game.getInvalidShots()));
         return file;
     }
 
