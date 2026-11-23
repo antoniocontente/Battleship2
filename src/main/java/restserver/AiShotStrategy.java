@@ -19,6 +19,8 @@ import java.util.*;
 @Component
 public class AiShotStrategy {
 
+	private Random random;
+
 	/**
 	 * Compute the next set of AI shots based on current game knowledge.
 	 *
@@ -57,7 +59,8 @@ public class AiShotStrategy {
 		// ── Phase 1 HUNT: fill remaining slots from checkerboard pattern ────
 		if (chosen.size() < Game.NUMBER_SHOTS) {
 			List<IPosition> huntPool = buildHuntPool(alreadyShot, chosen);
-			Collections.shuffle(huntPool, new Random(System.currentTimeMillis()));
+			random = new Random(System.currentTimeMillis());
+			Collections.shuffle(huntPool, random);
 			for (IPosition p : huntPool) {
 				if (chosen.size() >= Game.NUMBER_SHOTS) break;
 				chosen.add(p);
